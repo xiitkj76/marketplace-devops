@@ -1,0 +1,32 @@
+.store-row {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Jarak antara checkbox, gambar toko, dan nama toko */
+}
+
+.item-checkbox {
+    margin: 0;
+    vertical-align: middle;
+}
+
+.store-avatar {
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.col-1 {
+    display: flex;
+    justify-content: flex-start; /* Checkbox di kiri */
+}
+
+.col-2 img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+}

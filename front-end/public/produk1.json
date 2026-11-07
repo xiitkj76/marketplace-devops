@@ -1,0 +1,103 @@
+// [
+//   {
+//       "id": 1001,
+//       "price": 111000,
+//       "category": "Buku",
+//       "title": "Buku Mindset (Edisi Revisi) - Carol S. Dweck, Ph. D.",
+//       "description": "Terbukti telah mengubah cara orang melihat dunia dan kesuksesan hidup di berbagai belahan dunia, Mindset bertengger jadi topseller di amazon.com sejak 13 tahun lalu hingga sekarang",
+//       "images": ["https://jbr.id/wp-content/uploads/mindset-copy.jpg"],
+//       "shop": {
+//           "id": 101,
+//           "name": "Book Culture"
+//       },
+//       "discount_percentage": 15
+//   },
+//   {
+//       "id": 1002,
+//       "price": 90000,
+//       "category": "Buku",
+//       "title": "Buku The Psychology of Money - Morgan Housel",
+//       "description": "Adjustable laptop stand for better posture.",
+//       "images": ["https://lpmneraca.com/wp-content/uploads/2023/07/phsykologi-of-money.jpg"],
+//       "shop": {
+//           "id": 101,
+//           "name": "Book Culture"
+//       },
+//       "discount_percentage": 10
+//   },
+//   {
+//       "id": 2001,
+//       "price": 19999,
+//       "category": "Fashion Pria",
+//       "title": "Gelang Pria Tali Hitam Paracord Prusik Prodigo Dali Motif 1",
+//       "description": "Aksesoris dari prodigon nambah lagi nih guys, sekarang ada gelang tali berbahan prusik dengan warna hitam yg kece.",
+//       "images": [
+//           "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWq8OP-EQMsdgMQBzSbL8b1V0MOrQy7-2wgw&s"
+//       ],
+//       "shop": {
+//           "id": 102,
+//           "name": "Prodigo Official"
+//       },
+//       "discount_percentage": 0
+//   },
+//   {
+//       "id": 3001,
+//       "price": 855000,
+//       "category": "Otomotif",
+//       "title": "Helm Motor Half Face SNI Elders Company Classic - Candy Black / Brown - S",
+//       "description": "Helm anti petjah!",
+//       "images": [
+//           "https://images.tokopedia.net/img/cache/500-square/VqbcmM/2023/8/25/8822a98f-1e39-49ba-9b48-c2bfc1416e57.jpg"
+//       ],
+//       "shop": {
+//           "id": 103,
+//           "name": "Elders Company"
+//       },
+//       "discount_percentage": 30
+//   },
+//   {
+//       "id": 4001,
+//       "price": 409999,
+//       "category": "Otomotif",
+//       "title": "RTD Rayton Mini Proji Led Otomotif Motor Biled X1 1.5 Inci 52W LowHigh - Merah",
+//       "description": "Lampu Biled Dengan Lampu dekat dan Jauh dan Pemasangan mudah dan fleksibel dengan Type Universal",
+//       "images": [
+//           "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmuAwbarmBR0zduQRUl2pOLWE3_6Eb5hN0Dg&s"
+//       ],
+//       "shop": {
+//           "id": 104,
+//           "name": "RTD Store"
+//       },
+//       "discount_percentage": 10
+//   },
+//   {
+//       "id": 5001,
+//       "price": 249999,
+//       "category": "Fashion Pria",
+//       "title": "Casio Jam Tangan Pria MQ-24-1BLDF",
+//       "description": "Pasio [MQ-24-1BLDF] Jam tangan pria dalam format analog. Desain simpel dan casual dapat digunakan sehari-hari.",
+//       "images": [
+//           "https://media.dinomarket.com/docs/imgTD/2022-07/_SMine_1658897389453_270722110750_xl.jpg"
+//       ],
+//       "shop": {
+//           "id": 105,
+//           "name": "Casio Store"
+//       },
+//       "discount_percentage": 10
+//   },
+//   {
+//       "id": 6001,
+//       "price": 259000,
+//       "category": "Komputer & Laptop",
+//       "title": "Olyps Wireless Keyboard Mouse Komputer Combo 2.4Ghz With USB Receiver",
+//       "description": "Keyboard dengan ketukan senyap, geser sensitif, Nirkabel 2,4 GHZ yang cocok untuk memenuhi kebutuhan kantor.",
+//       "images": [
+//           "https://images.tokopedia.net/img/cache/700/VqbcmM/2024/10/8/c627d9ae-c9be-42f6-bc05-45d23177623f.jpg"
+//       ],
+//       "shop": {
+//           "id": 106,
+//           "name": "Olyps Store"
+//       },
+//       "discount_percentage": 25
+//   }
+// ]
