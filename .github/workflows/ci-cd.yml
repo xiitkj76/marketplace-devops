@@ -1,0 +1,136 @@
+name: CI/CD Marketplace
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  # ============ CI 1: build semua container lalu uji ============
+  test:
+    name: CI - Build & Smoke Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout kode
+        uses: actions/checkout@v4
+
+      - name: Siapkan file .env untuk testing
+        run: cp .env.example .env
+
+      - name: Build dan jalankan semua container
+        run: docker compose up -d --build
+
+      - name: Tunggu database healthy
+        run: |
+          for i in $(seq 1 30); do
+            STATUS=$(docker inspect -f '{{.State.Health.Status}}' marketplace-db)
+            echo "status db: $STATUS"
+            [ "$STATUS" = "healthy" ] && exit 0
+            sleep 5
+          done
+          exit 1
+
+      - name: Jalankan smoke test
+        run: bash tests/smoke-test.sh
+
+      - name: Tampilkan log jika gagal
+        if: failure()
+        run: docker compose logs
+
+      - name: Bersihkan container
+        if: always()
+        run: docker compose down -v
+
+  # ============ CI 2: build & push image ke Docker Hub ============
+  build-push:
+    name: CI - Push Image ke Docker Hub
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout kode
+        uses: actions/checkout@v4
+
+      - name: Login ke Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build & push image database
+        uses: docker/build-push-action@v6
+        with:
+          context: ./db-init
+          push: true
+          tags: |
+            ${{ vars.DOCKERHUB_USERNAME }}/marketplace-db:latest
+            ${{ vars.DOCKERHUB_USERNAME }}/marketplace-db:${{ github.sha }}
+
+      - name: Build & push image backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./back-end
+          push: true
+          tags: |
+            ${{ vars.DOCKERHUB_USERNAME }}/marketplace-backend:latest
+            ${{ vars.DOCKERHUB_USERNAME }}/marketplace-backend:${{ github.sha }}
+
+      - name: Build & push image frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./front-end
+          push: true
+          build-args: |
+            REACT_APP_API_URL=http://localhost:3001
+          tags: |
+            ${{ vars.DOCKERHUB_USERNAME }}/marketplace-frontend:latest
+            ${{ vars.DOCKERHUB_USERNAME }}/marketplace-frontend:${{ github.sha }}
+
+  # ============ CD: deploy otomatis lewat runner di laptop ketua ============
+  deploy:
+    name: CD - Deploy ke Server (Runner Docker)
+    needs: build-push
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, linux, docker-deploy]
+    steps:
+      - name: Checkout kode
+        uses: actions/checkout@v4
+
+      - name: Buat file .env dari GitHub Secrets
+        run: |
+          cat > .env <<EOF
+          DOCKERHUB_USERNAME=${{ vars.DOCKERHUB_USERNAME }}
+          DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
+          DB_NAME=marketplace
+          DB_USER=marketplace
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          API_URL=http://localhost:3001
+          EOF
+
+      - name: Tarik image terbaru dari Docker Hub
+        run: docker compose pull
+
+      - name: Jalankan ulang container dengan image baru
+        run: docker compose up -d --no-build --remove-orphans
+
+      - name: Verifikasi aplikasi berjalan
+        run: |
+          for i in $(seq 1 20); do
+            COUNT=$(docker exec marketplace-backend wget -qO- http://localhost:3001/items 2>/dev/null | grep -o '"id":' | wc -l)
+            if [ "$COUNT" -eq 30 ]; then
+              echo "Deploy berhasil: $COUNT produk tersedia"
+              docker compose ps
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Backend tidak merespons setelah deploy"
+          exit 1
+
+      - name: Hapus image lama
+        run: docker image prune -f

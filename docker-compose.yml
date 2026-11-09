@@ -1,7 +1,10 @@
+name : marketplace
+
 services:
   # ---------- Database ----------
   db:
-    image: mariadb:11.4
+    build: ./db-init
+    image: ${DOCKERHUB_USERNAME:-local}/marketplace-db:latest
     container_name: marketplace-db
     restart: unless-stopped
     environment:
@@ -11,7 +14,6 @@ services:
       MARIADB_PASSWORD: ${DB_PASSWORD}
     volumes:
       - db_data:/var/lib/mysql                         # data tetap tersimpan
-      - ./db-init:/docker-entrypoint-initdb.d:ro       # impor SQL saat pertama kali
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
@@ -22,7 +24,7 @@ services:
   # ---------- Backend (Express) ----------
   backend:
     build: ./back-end
-    image: marketplace-backend
+    image: ${DOCKERHUB_USERNAME:-local}/marketplace-backend:latest
     container_name: marketplace-backend
     restart: unless-stopped
     environment:
@@ -43,7 +45,7 @@ services:
       context: ./front-end
       args:
         REACT_APP_API_URL: ${API_URL}
-    image: marketplace-frontend
+    image: ${DOCKERHUB_USERNAME:-local}/marketplace-frontend:latest
     container_name: marketplace-frontend
     restart: unless-stopped
     ports:
