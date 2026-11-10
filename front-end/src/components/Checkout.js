@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { API_URL } from "../config";
+
+const SHIPPING_FEE = 20000;
 
 const Checkout = () => {
   const [cart, setCart] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [address, setAddress] = useState("Jl. Contoh No. 123, Jakarta, Indonesia");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const shippingFee = cart.length > 0 ? SHIPPING_FEE : 0;
+  const totalPayment = totalPrice + shippingFee;
 
   // Fetch cart data
   useEffect(() => {
@@ -17,7 +24,7 @@ const Checkout = () => {
         setCart(data.hasil);
         calculateTotalPrice(data.hasil);
       } catch (error) {
-        console.error(error.message);
+        setError(error.message);
       }
     };
 
@@ -39,24 +46,36 @@ const Checkout = () => {
     price.toLocaleString("id-ID", { style: "decimal", minimumFractionDigits: 0 });
 
   const handlePlaceOrder = async () => {
+    setError("");
+    setSubmitting(true);
     try {
       const response = await fetch(`${API_URL}/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cart, address, totalPrice }),
+        body: JSON.stringify({ cart, address, totalPrice: totalPayment }),
       });
 
-      if (!response.ok) throw new Error("Failed to place order");
-      alert("Pesanan berhasil dibuat!");
-      setCart([]); // Clear cart
-      setTotalPrice(0); // Reset total price
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Gagal membuat pesanan.");
+      }
+      navigate("/orders", {
+        state: { successMessage: data.message || "Pesanan berhasil dibuat." },
+      });
     } catch (error) {
-      console.error("Error placing order:", error);
+      setError(error.message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
     <div className="container my-5">
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      )}
 
       <div className="row">
         {/* Left Section: Cart Items */}
@@ -134,19 +153,19 @@ const Checkout = () => {
               </div>
               <div className="d-flex justify-content-between mb-3">
                 <span>Ongkos Kirim</span>
-                <strong>Rp{formatPrice(20000)}</strong>
+                <strong>Rp{formatPrice(shippingFee)}</strong>
               </div>
               <hr />
               <div className="d-flex justify-content-between mb-3">
                 <span>Total Bayar</span>
-                <strong>Rp{formatPrice(totalPrice + 20000)}</strong>
+                <strong>Rp{formatPrice(totalPayment)}</strong>
               </div>
               <button
                 onClick={handlePlaceOrder}
                 className="btn btn-success w-100"
-                disabled={cart.length === 0}
+                disabled={cart.length === 0 || submitting}
               >
-                Buat Pesanan
+                {submitting ? "Memproses..." : "Buat Pesanan"}
               </button>
               <Link to="/cart" className="btn btn-secondary w-100 mt-2">
                 Kembali ke keranjang
