@@ -380,7 +380,7 @@ const Cart = ({ isCheckout, setIsCheckout }) => {
         </h5>
         {!isCheckout && (
           <button className="btn btn-success">
-            <Link to="/checkout" name="btn btn-success mb-4">
+            <Link to="/checkout" name="btn btn-success mb-4" style={{ color: "white", textDecoration: "none" }}>
               Pergi ke keranjang
             </Link>
           </button>
