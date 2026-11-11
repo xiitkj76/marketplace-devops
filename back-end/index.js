@@ -316,7 +316,7 @@ app.post("/orders", (req, res) => {
   const { cart, address, totalPrice } = req.body;
   
   if (!Array.isArray(cart) || cart.length === 0) {
-    return res.status(400).json({ error: "Tidak ada item untuk dipesan" });
+    return res.status(200).json({ error: "Tidak ada item untuk dipesan" });
   }
 
   conn.beginTransaction((err) => {
