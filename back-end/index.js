@@ -1,207 +1,3 @@
-// const express = require("express");
-// const app = express();
-// const bodyParser = require("body-parser");
-// const cors = require("cors");
-// const path = require("path");
-// require("dotenv").config();
-// const port = 3001;
-// const mysql = require("mysql");
-// const conn = mysql.createConnection({
-//   host: "localhost",
-//   user: "root",
-//   password: "",
-//   database: "marketplace",
-// });
-
-// conn.connect((err) => {
-//   if (err) throw err;
-//   console.log("MySQL Connected...");
-// });
-
-// app.use(cors());
-// app.use(express.json());
-// app.use(bodyParser.json());
-// app.use(express.static(path.join(__dirname, "public")));
-
-// app.get("/data/:filename", (req, res) => {
-//   const { filename } = req.params;
-//   const imagePath = path.join(__dirname, "public/images", filename);
-//   res.sendFile(imagePath, (err) => {
-//     if (err) {
-//       console.error("Error serving image:", err);
-//       res.status(404).send("Image not found");
-//     }
-//   });
-// });
-
-// // GET items
-// app.get("/items", (req, res) => {
-//   const sql = `
-//   SELECT
-//     items.store_id,
-//     items.name,
-//     items.price,
-//     items.category,
-//     items.discount_percent,
-//     items.image,
-//     items.description,
-//     stores.name AS dataname,
-//     stores.avatar AS avatar
-//   FROM
-//     items
-//   LEFT JOIN 
-//       stores ON items.store_id = stores.id
-// `;
-//   conn.query(sql, (err, results) => {
-//     if (err) return res.status(500).send(err);
-//     res.status(200).json({ data: results });
-//   });
-// });
-
-// // POST items
-// app.post("/items", (req, res) => {
-//   const {
-//     store_id,
-//     name,
-//     price,
-//     category,
-//     discount_percent,
-//     image,
-//     description,
-//   } = req.body;
-//   const sql =
-//     "INSERT INTO items (store_id, name, price, category, discount_percent, image, description) VALUES (?, ?, ?, ?, ?, ?, ?)";
-//   conn.query(
-//     sql,
-//     [store_id, name, price, category, discount_percent, image, description],
-//     (err, result) => {
-//       if (err) return res.status(500).send(err);
-//       res.status(201).json({ message: "Items Add successfully" });
-//     }
-//   );
-// });
-
-// // GET cart
-// app.get("/cart", (req, res) => {
-//   const sql = `
-//     SELECT c.id AS cart_id, i.name, i.price, i.discount_percent, c.quantity, c.note, c.checked
-//     FROM cart c
-//     JOIN items i ON c.item_id = i.id
-//   `;
-//   conn.query(sql, (err, results) => {
-//     if (err) return res.status(500).send(err);
-//     res.status(200).json({ hasil: results });
-//   });
-// });
- 
-// app.post("/cart", async (req, res) => {
-// 	const { item_id, quantity, is_checked, note } = req.body;
-  
-// 	try {
-// 	  console.log("Request received:", req.body); // Log data yang diterima
-  
-// 	  // Cek apakah produk sudah ada di cart
-// 	  const [existing] = await pool.query(
-// 		"SELECT * FROM cart WHERE item_id = ?",
-// 		[item_id]
-// 	  );
-  
-// 	  if (existing.length > 0) {
-// 		// Produk sudah ada di cart, update kuantitas
-// 		const newQuantity = existing[0].quantity + quantity;
-// 		console.log("Updating quantity for item:", existing[0].id);
-  
-// 		await pool.query(
-// 		  "UPDATE cart SET quantity = ?, is_checked = ?, note = ? WHERE id = ?",
-// 		  [newQuantity, is_checked, note, existing[0].id]
-// 		);
-  
-// 		return res.json({ message: "Quantity updated successfully", id: existing[0].id });
-// 	  } else {
-// 		// Produk belum ada di cart, tambahkan
-// 		console.log("Inserting new item to cart:", item_id);
-  
-// 		const [result] = await pool.query(
-// 		  "INSERT INTO cart (item_id, quantity, is_checked, note) VALUES (?, ?, ?, ?)",
-// 		  [item_id, quantity, is_checked, note]
-// 		);
-  
-// 		return res.status(201).json({ message: "Item added to cart", id: result.insertId });
-// 	  }
-// 	} catch (error) {
-// 	  console.error("Error adding to cart:", error.message); // Log error
-// 	  return res.status(500).json({ error: error.message });
-// 	}
-//   });
-  
-  
-//  // app.put("/cart/:id", (req, res) => {
-// //   const { id } = req.params;
-// //   const { quantity, note, checked } = req.body;
-
-// //   // SQL Query untuk hanya memperbarui field yang dikirim
-// //   const sql = `
-// // 	  UPDATE cart
-// // 	  SET 
-// // 		quantity = COALESCE(?, quantity), 
-// // 		note = COALESCE(?, note), 
-// // 		checked = COALESCE(?, checked)
-// // 	  WHERE id = ?
-// // 	`;
-
-// //   conn.query(sql, [quantity, note, checked, id], (err) => {
-// //     if (err) return res.status(500).send(err);
-// //     res.status(200).json({ message: "Cart updated successfully" });
-// //   });
-// // });
-
-
-// app.put("/cart/:id", (req, res) => {
-// 	const { id } = req.params;
-// 	const { note, checked } = req.body;
-  
-// 	const sql = `
-// 	  UPDATE cart
-// 	  SET 
-// 		note = COALESCE(?, note), 
-// 		checked = COALESCE(?, checked)
-// 	  WHERE id = ?
-// 	`;
-  
-// 	conn.query(sql, [note, checked, id], (err) => {
-// 	  if (err) return res.status(500).send(err);
-// 	  res.status(200).json({ message: "Cart updated successfully" });
-// 	});
-//   });
-  
-
-
-
-
-// // DELETE cart (per item) 
-// app.delete("/cart/:id", (req, res) => {
-//   const { id } = req.params;
-//   const sql = "DELETE FROM cart WHERE id = ?";
-//   conn.query(sql, [id], (err, results) => {
-//     if (err) return res.status(500).send(err);
-//     if (results.affectedRows === 0) {
-//       return res.status(404).json({ message: "Item not found" });
-//     }
-//     res.status(200).json({ message: "Cart item deleted" });
-//   });
-// });
-
-// // DELETE cart (all items)
-// app.delete("/cart", (req, res) => {
-//   const sql = "DELETE FROM cart";
-//   conn.query(sql, (err, results) => {
-//     if (err) return res.status(500).send(err);
-//     res.status(200).json({ message: "All cart items deleted" });
-//   });
-// });
-
-// app.listen(port, () => console.log(`Server running on port ${port}`));
-
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
@@ -221,6 +17,30 @@ conn.connect((err) => {
   if (err) throw err;
   console.log("MySQL Connected...");
 });
+
+const migrations = [
+  `CREATE TABLE IF NOT EXISTS orders (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  address TEXT,
+  total_price INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`,
+  `CREATE TABLE IF NOT EXISTS order_items (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  order_id INT NOT NULL,
+  item_name VARCHAR(100),
+  price INT,
+  discount_percent INT,
+  quantity INT,
+  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+  )`,
+];
+migrations.forEach((sql) =>
+  conn.query(sql, (err) => {
+    if (err) throw err;
+  })
+);
+console.log("Migrasi tabel orders siap");
 
 app.use(cors());
 app.use(express.json());
@@ -339,48 +159,8 @@ app.post("/items", (req, res) => {
   );
 });
 
-// GET cart
-// app.get("/cart", (req, res) => {
-//   const sql = `
-//     SELECT c.id AS cart_id, i.name, i.price, i.discount_percent, c.quantity, c.note, c.checked
-//     FROM cart c
-//     JOIN items i ON c.item_id = i.id
-//   `;
-//   conn.query(sql, (err, results) => {
-//     if (err) return res.status(500).send(err);
-//     res.status(200).json({ hasil: results });
-//   });
-// });
-
-
-// GET stores
-app.get("/stores", (req, res) => {
-	const sql = `
-	  SELECT id AS store_id, name AS store_name, avatar AS store_avatar, checked_all
-	  FROM stores
-	`;
-	conn.query(sql, (err, results) => {
-	  if (err) return res.status(500).send(err);
-	  res.status(200).json({ stores: results });
-	});
-  });
-  
-  app.put("/stores/:storeId", (req, res) => {
-	const { storeId } = req.params;
-	const { checked_all } = req.body;
-  
-	const sql = `
-	  UPDATE stores
-	  SET checked_all = ?
-	  WHERE id = ?
-	`;
-	conn.query(sql, [checked_all, storeId], (err) => {
-	  if (err) return res.status(500).send(err);
-	  res.status(200).json({ message: "Store's checked_all updated successfully" });
-	});
-  });
-
-  app.delete("/cart/store/:storeId", (req, res) => {
+// Endpoint DELETE untuk Cart by Store (Dipakai halaman Cart)
+app.delete("/cart/store/:storeId", (req, res) => {
 	const { storeId } = req.params;
 	const sql = "DELETE FROM cart WHERE item_id IN (SELECT id FROM items WHERE store_id = ?)";
 	
@@ -389,8 +169,6 @@ app.get("/stores", (req, res) => {
 	  res.status(200).json({ message: "Items from the store deleted successfully" });
 	});
   });
-  
-  
 
 app.get("/cart", (req, res) => {
 	const sql = `
@@ -417,7 +195,7 @@ app.get("/cart", (req, res) => {
   });
 
   app.get("/cart/:checked", (req, res) => {
-	const isChecked = req.params.checked === "true"; // Mengonversi parameter ke boolean
+	const isChecked = req.params.checked === "true";
   
 	const sql = `
 	  SELECT 
@@ -443,20 +221,17 @@ app.get("/cart", (req, res) => {
 	  res.status(200).json({ hasil: results });
 	});
   });
-  
-  
 
 app.post("/cart", (req, res) => {
 	const { item_id, quantity, is_checked, note } = req.body;
   
-	console.log("Request received with data:", req.body); // Log data dari frontend
+	console.log("Request received with data:", req.body); 
   
 	if (!item_id) {
 	  console.error("item_id is missing");
 	  return res.status(400).json({ error: "item_id is required" });
 	}
   
-	// Lanjutkan dengan query database
 	const checkQuery = "SELECT * FROM cart WHERE item_id = ?";
 	conn.query(checkQuery, [item_id], (err, results) => {
 	  if (err) {
@@ -496,50 +271,16 @@ app.post("/cart", (req, res) => {
 	});
   });
 
-  app.post("/login", (req, res) => {
-	const { email, password } = req.body;
-  
-	const sql = "SELECT * FROM users WHERE email = ? AND password = ?";
-	db.query(sql, [email, password], (err, results) => {
-	  if (err) return res.status(500).json({ message: "Database error." });
-	  if (results.length === 0)
-		return res.status(401).json({ message: "Email atau password salah." });
-  
-	  res.json({ username: results[0].username, email: results[0].email });
-	});
-  });
-  
-  
-
-// app.put("/cart/:id", (req, res) => {
-//   const { id } = req.params; 
-//   const { note, checked } = req.body;
-
-//   const sql = `
-//     UPDATE cart
-//     SET 
-//       note = COALESCE(?, note), 
-//       checked = COALESCE(?, checked)
-//     WHERE id = ?
-//   `;
-
-//   conn.query(sql, [note, checked, id], (err) => {
-//     if (err) return res.status(500).send(err);
-//     res.status(200).json({ message: "Cart updated successfully" });
-//   });
-// });
-
-
 app.put("/cart/:id", (req, res) => {
 	const { id } = req.params;
-	const { note, checked, quantity } = req.body; // Tambahkan quantity
+	const { note, checked, quantity } = req.body;
   
 	const sql = `
 	  UPDATE cart
 	  SET 
 		note = COALESCE(?, note), 
 		checked = COALESCE(?, checked),
-		quantity = COALESCE(?, quantity) -- Tambahkan quantity
+		quantity = COALESCE(?, quantity)
 	  WHERE id = ?
 	`;
   
@@ -548,7 +289,6 @@ app.put("/cart/:id", (req, res) => {
 	  res.status(200).json({ message: "Cart updated successfully" });
 	});
   });
-  
 
 // DELETE cart (per item) 
 app.delete("/cart/:id", (req, res) => {
@@ -569,6 +309,58 @@ app.delete("/cart", (req, res) => {
   conn.query(sql, (err, results) => {
     if (err) return res.status(500).send(err);
     res.status(200).json({ message: "All cart items deleted" });
+  });
+});
+
+app.post("/orders", (req, res) => {
+  const { cart, address, totalPrice } = req.body;
+  
+  if (!Array.isArray(cart) || cart.length === 0) {
+    return res.status(400).json({ error: "Tidak ada item untuk dipesan" });
+  }
+
+  conn.beginTransaction((err) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    const gagal = (err) => conn.rollback(() => res.status(500).json({ error: err.message }));
+
+    // 1. Simpan data pesanan
+    conn.query("INSERT INTO orders (address, total_price) VALUES (?, ?)", [address || " ", Math.round(totalPrice || 0)], (err, result) => {
+      if (err) return gagal(err);
+      const orderId = result.insertId;
+
+      // 2. Simpan rincian barang
+      const rows = cart.map(i => [orderId, i.item_name, i.price, i.discount_percent, i.quantity]);
+      conn.query("INSERT INTO order_items (order_id, item_name, price, discount_percent, quantity) VALUES ?", [rows], (err) => {
+        if (err) return gagal(err);
+
+        // 3. Hapus item yang sudah dipesan dari keranjang
+        const cartIds = cart.map(i => i.cart_id);
+        conn.query("DELETE FROM cart WHERE id IN (?)", [cartIds], (err) => {
+          if (err) return gagal(err);
+          
+          conn.commit((err) => {
+            if (err) return gagal(err);
+            res.status(201).json({ message: "Pesanan berhasil dibuat", order_id: orderId });
+          });
+        });
+      });
+    });
+  });
+});
+
+// GET orders: daftar pesanan
+app.get("/orders", (req, res) => {
+  const sql = `
+    SELECT o.id, o.address, o.total_price, o.created_at, COUNT(o.id) AS jumlah_item 
+    FROM orders o 
+    LEFT JOIN order_items oi ON oi.order_id = o.id 
+    GROUP BY o.id 
+    ORDER BY o.created_at DESC
+  `;
+  conn.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.status(200).json({ orders: results });
   });
 });
 
