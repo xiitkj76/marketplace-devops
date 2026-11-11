@@ -34,4 +34,32 @@ curl -sf "$FRONTEND/" | grep -q '<div id="root">'
 curl -sf "$FRONTEND/cart" | grep -q '<div id="root">'
 echo "  OK"
 
+echo "Test 6: POST /orders dengan keranjang kosong ditolak (400)"
+STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BACKEND/orders" \
+-H "Content-Type: application/json" -d '{"cart": []}')
+[ "$STATUS" -eq 400 ] || { echo "GAGAL: status $STATUS, seharusnya 400"; exit 1; }
+echo " OK"
+echo "Test 7: alur checkout lengkap (tambah ke keranjang -> buat pesanan)"
+curl -sf -X POST "$BACKEND/cart" -H "Content-Type: application/json" \
+-d '{"item_id": 1, "quantity": 2, "is_checked": true, "note": "test CI"}' > /dev/null
+CART=$(curl -sf "$BACKEND/cart/true" | jq '.hasil')
+[ "$(echo "$CART" | jq 'length')" -ge 1 ] || { echo "GAGAL: keranjang kosong"; exit 1; }
+BODY=$(jq -n --argjson cart "$CART" \
+'{cart: $cart, address: "Alamat Test CI", totalPrice: 100000}')
+RESP=$(curl -s -w "\n%{http_code}" -X POST "$BACKEND/orders" \
+-H "Content-Type: application/json" -d "$BODY")
+STATUS=$(echo "$RESP" | tail -n1)
+ORDER_ID=$(echo "$RESP" | head -n1 | jq '.order_id')
+[ "$STATUS" -eq 201 ] || { echo "GAGAL: status $STATUS, seharusnya 201"; exit 1; }
+echo " OK (order_id $ORDER_ID)"
+echo "Test 8: pesanan tercatat di GET /orders dan keranjang dikosongkan"
+curl -sf "$BACKEND/orders" | jq -e --argjson id "$ORDER_ID" \
+'.orders | any(.id == $id)' > /dev/null || { echo "GAGAL: pesanan tidak ada"; exit 1; }
+SISA=$(curl -sf "$BACKEND/cart/true" | jq '.hasil | length')
+[ "$SISA" -eq 0 ] || { echo "GAGAL: masih ada $SISA item di keranjang"; exit 1; }
+echo " OK"
+echo "Test 9: halaman Riwayat Pesanan (/orders) dapat diakses di frontend"
+curl -sf "$FRONTEND/orders" | grep -q '<div id="root">'
+echo " OK"
+
 echo "Semua smoke test LULUS"
